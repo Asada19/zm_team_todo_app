@@ -1,5 +1,22 @@
-version: '3'
+version: '3.12'
 services:
+  db:
+    image: postgres:latest
+    environment:
+      POSTGRES_USER: ${PG_USER}
+      POSTGRES_PASSWORD: ${PG_PASSWORD}
+      POSTGRES_DB: ${PG_DB_NAME}
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - 5432:5432
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    env_file:
+      - .env
+    restart: unless-stopped
+    networks:
+      - app_network
+
   web:
     build: .
     command: uvicorn main:app --reload --host 0.0.0.0 --port 8000
@@ -11,24 +28,16 @@ services:
       - db
     env_file:
       - .env
-    restart: unless-stopped
-
-  db:
-    image: postgres:latest
     environment:
-      POSTGRES_USER: ${PG_USER}
-      POSTGRES_PASSWORD: ${PG_PASSWORD}
-      POSTGRES_DB: ${PG_DB_NAME}
-      PGDATA: /var/lib/postgresql/data/pgdata
-    ports:
-      - ${PG_PORT}
-    volumes:
-      - postgres_data:/var/lib/postgresql/data
-    env_file:
-      - .env
+      DATABASE_URL: postgresql+asyncp://${PG_USER}:${PG_PASSWORD}@db:5432/${PG_DB_NAME}
     restart: unless-stopped
-
+    networks:
+      - app_network
 
 volumes:
   postgres_data:
     driver: local
+
+networks:
+  app_network:
+    driver: bridge

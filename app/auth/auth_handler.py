@@ -1,11 +1,17 @@
+import os
 import time
 from typing import Dict
+
 import jwt
-from decouple import config
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
-JWT_SECRET = config("secret")
-JWT_ALGORITHM = config("algorithm")
+JWT_SECRET = os.getenv("JWT_SECRET")
+JWT_ALGORITHM = os.getenv("JWT_ALGORITHM")
+
+JWT_EXPIRATION_TIME_SECONDS = os.getenv("JWT_EXPIRATION_TIME_SECONDS", default=600)
 
 
 def token_response(token: str):
@@ -13,9 +19,8 @@ def token_response(token: str):
 
 
 def sign_jwt(user_id: str) -> Dict[str, str]:
-    payload = {"user_id": user_id, "expires": time.time() + 600}
+    payload = {"user_id": user_id, "expires": time.time() + JWT_EXPIRATION_TIME_SECONDS}
     token = jwt.encode(payload, JWT_SECRET, algorithm=JWT_ALGORITHM)
-
     return token_response(token)
 
 

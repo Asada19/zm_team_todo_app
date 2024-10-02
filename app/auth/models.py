@@ -1,4 +1,4 @@
-from pydantic import BaseModel, Field, EmailStr
+from pydantic import BaseModel, EmailStr, Field
 
 
 class UserSchema(BaseModel):
@@ -10,19 +10,6 @@ class UserSchema(BaseModel):
         json_schema_extra = {
             "example": {
                 "fullname": "Zhumaev Rakhat",
-                "email": "zhumaevrakhat@gmail.com",
-                "password": "example_password",
-            }
-        }
-
-
-class UserLoginSchema(BaseModel):
-    email: EmailStr = Field(...)
-    password: str = Field(...)
-
-    class Config:
-        json_schema_extra = {
-            "example": {
                 "email": "zhumaevrakhat@gmail.com",
                 "password": "example_password",
             }
